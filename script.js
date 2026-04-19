@@ -1,94 +1,101 @@
-// Computer Choice Logic
+// =======================================================
+//  1. DOM ELEMENT REFERENCES
+// =======================================================
 
-function getComputerChoice() {
-  const computerChoice = Math.floor(Math.random() * 3);
-  let choice = "";
+const rockBtn = document.querySelector("#rock");
+const paperBtn = document.querySelector("#paper");
+const scissorsBtn = document.querySelector("#scissors");
+const playAgainBtn = document.querySelector("#play-again"); // Find the new button
 
-  if (computerChoice === 0) {
-    choice = "rock";
-  } else if (computerChoice === 1) {
-    choice = "paper";
-  } else {
-    choice = "scissors";
-  }
-  return choice;
-}
+const resultPara = document.querySelector("#result p"); 
+const scorePara = document.querySelector("#score p");
 
-// console.log("Computer choose:", getComputerChoice());
 
-// Human Choice Logic
-
-function getHumanChoice() {
-  let humanChoice = prompt("Choose between!  ROCK, PAPER, or SCISSORS ");
-  return humanChoice.toLowerCase();
-}
-
-// console.log("Human choose:", getHumanChoice());
-
-// Global Variable Declarations
+// =======================================================
+//  2. GAME STATE VARIABLES
+// =======================================================
 
 let humanScore = 0;
 let computerScore = 0;
-// let rounds = 5;
+const winningScore = 5;
 
-// Game Logic Single Round
+
+// =======================================================
+//  3. EVENT LISTENERS
+// =======================================================
+
+rockBtn.addEventListener("click", () => playRound("rock", getComputerChoice()));
+paperBtn.addEventListener("click", () => playRound("paper", getComputerChoice()));
+scissorsBtn.addEventListener("click", () => playRound("scissors", getComputerChoice()));
+playAgainBtn.addEventListener("click", resetGame); // Add listener for the new button
+
+
+// =======================================================
+//  4. CORE GAME FUNCTIONS
+// =======================================================
+
+function getComputerChoice() {
+  const choices = ["rock", "paper", "scissors"];
+  const randomIndex = Math.floor(Math.random() * choices.length);
+  return choices[randomIndex];
+}
 
 function playRound(humanChoice, computerChoice) {
-  // console.log(`You chose: ${humanChoice}`);
-  // console.log(`The computer chose: ${computerChoice}`);
-
   if (humanChoice === computerChoice) {
-    console.log(`It's a Tie! You Both chose:  ${humanChoice}.`);
-    humanScore++;
-    computerScore++;
+    resultPara.textContent = `It's a Tie! You both chose ${humanChoice}.`;
   } else if (
     (humanChoice === "rock" && computerChoice === "scissors") ||
     (humanChoice === "paper" && computerChoice === "rock") ||
     (humanChoice === "scissors" && computerChoice === "paper")
   ) {
-    console.log(`You win! ${humanChoice} beats ${computerChoice}.`);
     humanScore++;
+    resultPara.textContent = `You win this round! ${humanChoice} beats ${computerChoice}.`;
   } else {
-    console.log(`You lose! ${computerChoice} beats ${humanChoice}.`);
     computerScore++;
+    resultPara.textContent = `You lose this round! ${computerChoice} beats ${humanChoice}.`;
   }
 
-  // const humanSelection = getHumanChoice();
-  // const computerSelection = getComputerChoice();
-
-  // playRound(humanSelection, computerSelection);
+  scorePara.textContent = `You: ${humanScore} | Computer: ${computerScore}`;
+  checkForWinner();
 }
 
-// GamePlay function
-function playGame() {
-  const totalRounds = 5;
-  let currentRound = 1;
-
-  console.log(`--- Starting a new game of ${totalRounds} rounds! ---`);
-
-  while (currentRound <= totalRounds) {
-    console.log(`Round ${currentRound}`);
-
-    const humanSelection = getHumanChoice();
-    const computerSelection = getComputerChoice();
-
-    playRound(humanSelection, computerSelection);
-
-    console.log(`SCORE -> You: ${humanScore} | Computer: ${computerScore}`);
-
-    currentRound++;
-  }
-
-  console.log("\n--- GAME OVER ---");
-  console.log(`Final Score -> You: ${humanScore} | Computer: ${computerScore}`);
-
-  if (humanScore > computerScore) {
-    console.log("Congratulations! You won the series!");
-  } else if (computerScore > humanScore) {
-    console.log("You lost the series. Better luck next time!");
-  } else {
-    console.log("The series is a tie!");
+function checkForWinner() {
+  if (humanScore === winningScore || computerScore === winningScore) {
+    if (humanScore === winningScore) {
+      resultPara.textContent = `You are the champion!`;
+    } else {
+      resultPara.textContent = `GAME OVER! The computer wins this time.`;
+    }
+    endGame();
   }
 }
 
-playGame();
+// NEW FUNCTION: To reset the game to its initial state
+function resetGame() {
+  // Reset scores
+  humanScore = 0;
+  computerScore = 0;
+
+  // Reset display text
+  resultPara.textContent = "Click a button to start the game!";
+  scorePara.textContent = "You: 0 | Computer: 0";
+
+  // Re-enable the choice buttons
+  rockBtn.disabled = false;
+  paperBtn.disabled = false;
+  scissorsBtn.disabled = false;
+
+  // Hide the "Play Again" button
+  playAgainBtn.classList.add("hidden");
+}
+
+// UPDATED FUNCTION: Now also shows the "Play Again" button
+function endGame() {
+  // Disable the choice buttons
+  rockBtn.disabled = true;
+  paperBtn.disabled = true;
+  scissorsBtn.disabled = true;
+
+  // Show the "Play Again" button by removing the .hidden class
+  playAgainBtn.classList.remove("hidden");
+}
